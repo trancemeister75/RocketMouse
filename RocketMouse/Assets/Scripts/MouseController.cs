@@ -3,6 +3,7 @@ using System.Collections;
 
 public class MouseController : MonoBehaviour {
 	public float jetpackforce = 75.0f;
+	public float forwardMovementSpeed = 3.0f;
 	Rigidbody2D body;
 	// Use this for initialization
 	void Start () {
@@ -21,5 +22,8 @@ public class MouseController : MonoBehaviour {
 		{
 			body.AddForce(new Vector2(0,jetpackforce));
 		}
+		Vector2 newVelocity = body.velocity;
+		newVelocity.x = forwardMovementSpeed;
+		body.velocity = newVelocity;
 	}
 }
