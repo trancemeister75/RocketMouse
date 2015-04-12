@@ -6,6 +6,7 @@ public class MouseController : MonoBehaviour {
 	public float forwardMovementSpeed = 3.0f;
 	public Transform groundCheckTransform;
 	private bool grounded;
+	private bool dead = false;
 	public LayerMask groundCheckLayerMask;
 	Animator animator;
 	Rigidbody2D body;
@@ -24,13 +25,16 @@ public class MouseController : MonoBehaviour {
 	void FixedUpdate()
 	{
 		bool jetpackactive = Input.GetButton ("Fire1");
+		jetpackactive = jetpackactive && !dead;
 		if(jetpackactive)
 		{
 			body.AddForce(new Vector2(0,jetpackforce));
 		}
-		Vector2 newVelocity = body.velocity;
-		newVelocity.x = forwardMovementSpeed;
-		body.velocity = newVelocity;
+		if (!dead) {
+			Vector2 newVelocity = body.velocity;
+			newVelocity.x = forwardMovementSpeed;
+			body.velocity = newVelocity;
+		}
 		updateGroundedStatus ();
 		AdjustJetpack (jetpackactive);
 	}
@@ -45,5 +49,16 @@ public class MouseController : MonoBehaviour {
 	{
 		jetpack.enableEmission = !grounded;
 		jetpack.emissionRate = jetpackActive ? 300.0f : 75.0f;
+	}
+
+	void OnTriggerEnter2D(Collider2D collider)
+	{
+		HitByLaser (collider);
+	}
+
+	void HitByLaser(Collider2D collider)
+	{
+		dead = true;
+		animator.SetBool ("dead",true);
 	}
 }
