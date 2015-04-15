@@ -12,6 +12,10 @@ public class MouseController : MonoBehaviour {
 	Rigidbody2D body;
 	public ParticleSystem jetpack;
 	private uint coins = 0;
+	public Texture2D coinIconTexture;
+	public AudioClip coinCollectSound;
+	public AudioSource jetpackAudio;
+	public AudioSource footstepsAudio;
 	// Use this for initialization
 	void Start () {
 		body = GetComponent<Rigidbody2D>();
@@ -38,6 +42,7 @@ public class MouseController : MonoBehaviour {
 		}
 		updateGroundedStatus ();
 		AdjustJetpack (jetpackactive);
+		AdjustFootstepsAndJetpackSound(jetpackactive);
 	}
 
 	void updateGroundedStatus()
@@ -65,13 +70,57 @@ public class MouseController : MonoBehaviour {
 
 	void HitByLaser(Collider2D collider)
 	{
+		if (!dead) {
+			collider.gameObject.GetComponent<AudioSource>().Play();
+		}
 		dead = true;
 		animator.SetBool ("dead",true);
+
 	}
 
 	void CollectCoin(Collider2D collider)
 	{
 		coins++;
 		Destroy (collider.gameObject);
+		AudioSource.PlayClipAtPoint (coinCollectSound, transform.position);
+	}
+
+	void DisplayCoinsCount()
+	{
+		Rect coinIconRect = new Rect (10,10,32,32);
+		GUI.DrawTexture (coinIconRect, coinIconTexture);
+
+		GUIStyle style = new GUIStyle ();
+		style.fontSize = 30;
+		style.fontStyle = FontStyle.Bold;
+		style.normal.textColor = Color.yellow;
+
+		Rect labelRect = new Rect (coinIconRect.xMax,coinIconRect.y,60,32);
+		GUI.Label (labelRect, coins.ToString(),style);
+	}
+
+	void OnGUI()
+	{
+		DisplayCoinsCount ();
+		DisplayRestartButton ();
+	}
+
+	void DisplayRestartButton()
+	{
+		if (dead && grounded) {
+			Rect buttonRect = new Rect(Screen.width * 0.35f,Screen.height * 0.45f,Screen.width * 0.30f,Screen.height * 0.1f);
+			if(GUI.Button(buttonRect,"Tap to Restart!!"))
+			{
+				Application.LoadLevel(Application.loadedLevelName);
+			}
+		}
+	}
+
+	void AdjustFootstepsAndJetpackSound(bool jetpackActive)    
+	{
+		footstepsAudio.enabled = !dead && grounded;
+		
+		jetpackAudio.enabled =  !dead && !grounded;
+		jetpackAudio.volume = jetpackActive ? 1.0f : 0.5f;        
 	}
 }
