@@ -16,6 +16,7 @@ public class MouseController : MonoBehaviour {
 	public AudioClip coinCollectSound;
 	public AudioSource jetpackAudio;
 	public AudioSource footstepsAudio;
+	public ParallaxScroll parallax;
 	// Use this for initialization
 	void Start () {
 		body = GetComponent<Rigidbody2D>();
@@ -43,6 +44,7 @@ public class MouseController : MonoBehaviour {
 		updateGroundedStatus ();
 		AdjustJetpack (jetpackactive);
 		AdjustFootstepsAndJetpackSound(jetpackactive);
+		parallax.offset = transform.position.x;
 	}
 
 	void updateGroundedStatus()
